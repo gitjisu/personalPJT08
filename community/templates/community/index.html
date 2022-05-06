@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h1>Community</h1>
+  <hr>
+  {% for review in reviews %}
+  <p>
+    <b>작성자 : <a href="{% url 'accounts:profile' review.user.username %}">{{ review.user }}</a></b>
+  </p>
+  <p>글 번호 : {{ review.pk }}</p>
+  <p>글 제목 : {{ review.title }}</p>
+  <p>글 내용 : {{ review.content }}</p>
+  <div>
+    <form class="like-form" data-id="{{ review.pk }}">
+      {% csrf_token %}
+      {% if request.user in review.like_users.all %}
+        <button id="like-{{ review.pk }}">좋아요 취소</button>
+      {% else %}
+        <button id="like-{{ review.pk }}">좋아요</button>
+      {% endif %}
+    </form>
+  </div>
+  <p>
+    <span id="like-count-{{ review.pk }}">{{ review.like_users.all|length }}</span>
+    명이 이 글을 좋아합니다.</p>
+  <a href="{% url 'community:detail' review.pk %}">[DETAIL]</a>
+  <hr>
+{% endfor %}
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script>
+    // 1. form 태그(좋아요 버튼) 전부다 가져오기
+    const forms = document.querySelectorAll('.like-form')
+    const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value
+
+    forms.forEach(function (form) {
+      
+      form.addEventListener('submit', function (event) {
+        event.preventDefault()
+        // console.log(event)
+        const reviewId = event.target.dataset.id
+        // console.log(csrftoken)
+        axios.post(`http://127.0.0.1:8000/community/${reviewId}/like/`, {}, {
+          headers: {'X-CSRFToken': csrftoken},
+        })
+        .then(function (response) {
+          console.log(response.data)
+
+          //const count = response.data.count
+          //const liked = response.data.liked
+          
+          const { count, liked } = response.data
+          // console.log(count, liked)
+
+          const likeButton = document.querySelector(`#like-${reviewId}`)
+          if (liked) {
+            likeButton.innerText = '좋아요 취소'
+          } else {
+            likeButton.innerText = '좋아요'
+          }
+          // likeButton.innerText = liked ? '좋아요 취소' : '좋아요'
+
+          const likeCount = document.querySelector(`#like-count-${reviewId}`)
+          likeCount.innerText = count
+
+        })
+        .catch(err => {
+          console.log(err.response.status)
+          if (err.response.status === 401) {
+            window.location.href = '/accounts/login/'
+          }
+        })
+      })
+    })
+  </script>
+{% endblock %}

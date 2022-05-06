@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  {% comment %} <div id="app">
+    <h2>랜덤 영화추천</h2>
+    <button @click="getMovie">영화추천 받기</button>
+    <p>{{ movie }}</p>
+    <hr>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.20/lodash.min.js"></script>
+  <script>
+    const 
+  </script> {% endcomment %}
+<br>
+<h1 class='text-center'>영화 추천받기</h1>
+<br>
+<h4 class='text-center'> {{ user }}님께 {{ genre }} 영화 10개를 추천드려요 :)</h4>
+<hr>
+<div class="container d-flex">
+    <div class="col row row-cols-1 row-cols-md-3 g-4">
+      {% for movie in movies %}
+      <div class="card mx-1" style="width: 19.5rem;">
+        <a href="https://www.themoviedb.org/movie/{{movie.id}}"><img src="{{ poster|add:movie.poster_path }}" style="width: 286px; height: 450px" class="card-img-top" alt="movie's poster"></a>
+        <div class="card-body">
+          <a href="https://www.themoviedb.org/movie/{{movie.id}}" class="text-decoration-none text-dark">
+            <h5 class="card-title text-center"><{{ movie.title }}></h5>
+          </a>
+          <p class="card-text" style="font-size:13px">score : {{ movie.vote_average }}</p>
+          <p class="card-text" style="font-size:13px">release : {{ movie.release_date }}</p>
+          <a href="https://www.themoviedb.org/movie/{{movie.id}}"><p class="card-text d-inline-block text-truncate text-dark" style="max-width: 250px; font-size:15px">{{ movie.overview }}</p></a>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+</div>
+{% endblock %}
